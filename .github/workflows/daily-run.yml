@@ -1,0 +1,30 @@
+name: Daily Cigar Scrape
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install sqlalchemy pandas beautifulsoup4 requests lxml selenium
+
+      - name: Create secrets file
+        run: |
+          mkdir -p secrets
+          echo "${{ secrets.DB_LOGIN_FILE_CONTENT }}" > secrets/db_login_file
+
+      - name: Run the scraper
+        run: python main.py
