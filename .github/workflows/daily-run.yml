@@ -16,7 +16,6 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          # Use a stable version available on GitHub runners
           python-version: '3.12'
 
       - name: Install dependencies
@@ -24,8 +23,6 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      # Optional – only if your script needs DB credentials written to a file.
-      # Make sure you add a repo secret named DB_LOGIN_FILE_CONTENT if you keep this.
       - name: Write database credentials
         run: |
           mkdir -p secrets
