@@ -19,17 +19,21 @@ jobs:
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
-          pip install sqlalchemy pandas beautifulsoup4 requests lxml selenium
+          pip install sqlalchemy pandas beautifulsoup4 requests lxml selenium webdriver-manager
 
       - name: Create secrets file
         run: |
           mkdir -p secrets
           echo "${{ secrets.DB_LOGIN_FILE_CONTENT }}" > secrets/db_login_file
 
-                - name: Run the scraper
+      - name: Run the scraper
         working-directory: ${{ github.workspace }}
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          python -c "import sys; print('Python path:', sys.path)"
+          echo "=== Current folder contents ==="
+          ls -la
+          echo "=== Contents of src folder ==="
+          ls -la src || echo "src folder not found"
+          echo "=== Starting scraper ==="
           python main.py
