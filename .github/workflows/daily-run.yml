@@ -23,7 +23,8 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      # (This step is no longer needed for SQLite, you can delete it or comment it out)
+      # OPTIONAL: only needed if you want GitHub Actions to talk to a real DB
+      # If you don't have this set up yet, you can comment this block out.
       # - name: Write database credentials
       #   run: |
       #     mkdir -p secrets
@@ -32,7 +33,12 @@ jobs:
       - name: Run cigar scraper
         env:
           PYTHONPATH: ${{ github.workspace }}
-          USE_SQLITE: "1"
         run: |
           echo "Starting cigar scraper – $(date)"
           python main.py
+
+      - name: Upload CSV results
+        uses: actions/upload-artifact@v4
+        with:
+          name: cigar-scraper-csv
+          path: output/*.csv
