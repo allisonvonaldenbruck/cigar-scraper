@@ -3,8 +3,8 @@
 import os
 from pathlib import Path
 
-import sqlalchemy as sqa  # noqa: F401  # used indirectly via create_db
-import pandas as pd       # noqa: F401  # used in imported modules
+import sqlalchemy as sqa
+import pandas as pd  # noqa: F401  # used in imported modules
 
 from src.scraper import *
 from src.cleaner import *
@@ -28,6 +28,9 @@ DB_LOGIN_FILE = os.getenv(
     str(BASE_DIR / "secrets" / "db_login_file")
 )
 
+# If this is "1", we use a local SQLite database instead of MySQL.
+USE_SQLITE = os.getenv("USE_SQLITE", "0") == "1"
+
 
 def is_yes(buf: str) -> bool:
     return buf.lower() in ["y", "yes"]
@@ -38,16 +41,22 @@ def main() -> None:
 
     db_name = DB_NAME if not DEBUG else DEBUG_DB_NAME
 
-    # Helpful error if the login file is missing
-    if not os.path.exists(DB_LOGIN_FILE):
-        raise FileNotFoundError(
-            f"Database login file not found at: {DB_LOGIN_FILE}\n"
-            " - On GitHub Actions, make sure the 'Write database credentials' step ran.\n"
-            " - Locally, create 'secrets/db_login_file' next to main.py, "
-            "   or set the DB_LOGIN_FILE environment variable to the correct path."
-        )
-
-    engine = create_db(db_name, DB_LOGIN_FILE)
+    if USE_SQLITE:
+        # Use a sqlite file in the repo folder when running in CI
+        db_path = BASE_DIR / f"{db_name}.sqlite"
+        log("i", f"Using SQLite database at {db_path}")
+        engine = sqa.create_engine(f"sqlite:///{db_path}")
+    else:
+        # Original behavior: use credentials file to connect to MySQL
+        if not os.path.exists(DB_LOGIN_FILE):
+            raise FileNotFoundError(
+                f"Database login file not found at: {DB_LOGIN_FILE}\n"
+                " - On GitHub Actions, either set USE_SQLITE=1, or make sure "
+                "   the 'Write database credentials' step ran.\n"
+                " - Locally, create 'secrets/db_login_file' next to main.py, "
+                "   or set the DB_LOGIN_FILE environment variable."
+            )
+        engine = create_db(db_name, DB_LOGIN_FILE)
 
     interactive = False
 
