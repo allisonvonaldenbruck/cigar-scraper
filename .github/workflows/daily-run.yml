@@ -23,14 +23,16 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      - name: Write database credentials
-        run: |
-          mkdir -p secrets
-          echo "${{ secrets.DB_LOGIN_FILE_CONTENT }}" > secrets/db_login_file
+      # (This step is no longer needed for SQLite, you can delete it or comment it out)
+      # - name: Write database credentials
+      #   run: |
+      #     mkdir -p secrets
+      #     echo "${{ secrets.DB_LOGIN_FILE_CONTENT }}" > secrets/db_login_file
 
       - name: Run cigar scraper
         env:
           PYTHONPATH: ${{ github.workspace }}
+          USE_SQLITE: "1"
         run: |
           echo "Starting cigar scraper – $(date)"
           python main.py
