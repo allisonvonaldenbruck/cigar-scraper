@@ -26,7 +26,10 @@ jobs:
           mkdir -p secrets
           echo "${{ secrets.DB_LOGIN_FILE_CONTENT }}" > secrets/db_login_file
 
-      - name: Run the scraper
+                - name: Run the scraper
         working-directory: ${{ github.workspace }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          python -m src.main || python main.py
+          python -c "import sys; print('Python path:', sys.path)"
+          python main.py
