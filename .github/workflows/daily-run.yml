@@ -19,7 +19,7 @@ jobs:
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
-          pip install sqlalchemy pandas beautifulsoup4 requests lxml selenium webdriver-manager
+          pip install -r requirements.txt
 
       - name: Create secrets file
         run: |
@@ -31,9 +31,5 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          echo "=== Current folder contents ==="
-          ls -la
-          echo "=== Contents of src folder ==="
-          ls -la src || echo "src folder not found"
-          echo "=== Starting scraper ==="
+          echo "=== Starting cigar scraper ==="
           python main.py
